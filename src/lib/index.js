@@ -24,7 +24,7 @@ const SETUP = privateKey('setup'),
       PLACEHOLDER = privateKey('placeholder'),
       ELEMENT = privateKey('element'),
       SELECTION = privateKey('selection'),
-      TYPEOGRAPHER = privateKey('typographer'),
+      TYPOGRAPHER = privateKey('typographer'),
       PLUGINS = privateKey('plugins'),
       SELECTED_PLUGINS = privateKey('selectedPlugins');
 
@@ -33,7 +33,7 @@ export default class {
     const {
       plugins = [],
       inline = false,
-      typeographer = false,
+      typographer = false,
       placeholder = '',
       editable = false
     } = options;
@@ -42,7 +42,7 @@ export default class {
     this[PLUGINS] = {};
     this[ELEMENT] = element;
     this[INLINE] = inline;
-    this[TYPEOGRAPHER] = typeographer;
+    this[TYPOGRAPHER] = typographer;
     this[PLACEHOLDER] = placeholder;
     this[EMITTER] = mitt();
     this[SETUP]({ editable });
@@ -81,7 +81,7 @@ export default class {
     this[EDITABLE_KEY] = editablePlugin.key;
 
     plugins = flatten([
-      this.typeographer ? getInputRules() : [],
+      this.typographer ? getInputRules() : [],
       editablePlugin,
       getCustomPlugins({
         schema,
@@ -133,8 +133,8 @@ export default class {
     return this[PLACEHOLDER];
   }
 
-  get typeographer() {
-    return this[TYPEOGRAPHER];
+  get typographer() {
+    return this[TYPOGRAPHER];
   }
 
   get selection() {

@@ -34,7 +34,8 @@ export default class {
       plugins = [],
       inline = false,
       typeographer = false,
-      placeholder = ''
+      placeholder = '',
+      editable = false
     } = options;
 
     this[SELECTED_PLUGINS] = plugins;
@@ -44,10 +45,10 @@ export default class {
     this[TYPEOGRAPHER] = typeographer;
     this[PLACEHOLDER] = placeholder;
     this[EMITTER] = mitt();
-    this[SETUP]();
+    this[SETUP]({ editable });
   }
 
-  [SETUP]() {
+  [SETUP]({ editable } = {}) {
     let doc,
         schema,
         emit,
@@ -76,7 +77,7 @@ export default class {
 
     doc = this[PARSER].parse(this.element);
 
-    editablePlugin = getEditablePlugin({ editable: this.editable });
+    editablePlugin = getEditablePlugin({ editable: editable || this.editable });
     this[EDITABLE_KEY] = editablePlugin.key;
 
     plugins = flatten([

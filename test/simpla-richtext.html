@@ -50,20 +50,30 @@
           editor = new RichText(element);
         });
 
-        it('should be able to toggle editable', () => {
-          const isEditable = () => {
+        describe('editable', () => {
+          const isEditable = (editor) => {
             let editable = editor.element.contentEditable;
             return editable === true || editable === 'true';
           };
 
-          expect(editor.editable).to.be.false;
-          expect(isEditable()).to.be.false;
+          it('should initialise it with given editable property', () => {
+            let editableEditor = new RichText(fixture('default'), { editable: true }),
+                notEditableEditor = new RichText(fixture('default'), { editable: false });
 
-          editor.editable = true;
-          expect(isEditable()).to.be.true;
+            expect(isEditable(editableEditor)).to.be.true;
+            expect(isEditable(notEditableEditor)).to.be.false;
+          });
 
-          editor.editable = false;
-          expect(isEditable()).to.be.false;
+          it('should be able to toggle editable', () => {
+            expect(editor.editable).to.be.false;
+            expect(isEditable(editor)).to.be.false;
+
+            editor.editable = true;
+            expect(isEditable(editor)).to.be.true;
+
+            editor.editable = false;
+            expect(isEditable(editor)).to.be.false;
+          });
         });
 
         describe('plugins', () => {

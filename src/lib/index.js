@@ -169,6 +169,14 @@ export default class {
   }
 
   /**
+   * Focus on the editors element. Restores previous selection before blur
+   * @return {undefined}
+   */
+  focus() {
+    this[VIEW].focus();
+  }
+
+  /**
    * Set current HTML to given value. Will parse and sanitize any given HTML based
    *  on the current schema
    * @param  {string} value HTML string to set

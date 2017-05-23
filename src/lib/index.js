@@ -249,33 +249,30 @@ export default class {
   }
 
   /**
-   * Add given plugins to editor
-   * @param {Array<Plugin>} toAdd Plugins to add
+   * Enable given plugins in editor
+   * @param {Array<String>} plugins Plugins to enable
    * @return {undefined}
    */
-  addPlugins(toAdd) {
+  enablePlugins(plugins) {
     let current = this[SELECTED_PLUGINS],
         notAlreadySelected;
 
     notAlreadySelected = (plugin) => current.indexOf(plugin) === -1;
 
-    this[SELECTED_PLUGINS] = toAdd.filter(notAlreadySelected).concat(current);
+    this[SELECTED_PLUGINS] = plugins.filter(notAlreadySelected).concat(current);
 
     this[SETUP]();
   }
 
   /**
-   * Remove given plugins from editor
-   * @param {Array<Plugin>} toRemove Plugins to remove
+   * Disable given plugins from editor
+   * @param {Array<String>} plugins Plugins to disable
    * @return {undefined}
    */
-  removePlugins(toRemove) {
-    let current = this[SELECTED_PLUGINS],
-        notToRemove;
+  disablePlugins(plugins) {
+    let toKeep = (plugin) => plugins.indexOf(plugin) === -1;
 
-    notToRemove = (plugin) => toRemove.indexOf(plugin) === -1;
-
-    this[SELECTED_PLUGINS] = current.filter(notToRemove);
+    this[SELECTED_PLUGINS] = this[SELECTED_PLUGINS].filter(toKeep);
 
     this[SETUP]();
   }

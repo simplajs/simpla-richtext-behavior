@@ -227,15 +227,15 @@
 
           describe('adding / removing behavior', () => {
             it('should be able to remove plugins after the fact', () => {
-              editor.removePlugins([ 'bold' ]);
+              editor.disablePlugins([ 'bold' ]);
               editor.setHTML('<p><strong>Hello</strong></p>');
               expect(editor.plugins.bold).to.not.be.ok;
               expect(editor.getHTML()).to.equal('<p>Hello</p>');
             });
 
             it('should be able to add plugins after the fact', () => {
-              editor.removePlugins([ 'bold' ]);
-              editor.addPlugins([ 'bold' ]);
+              editor.disablePlugins([ 'bold' ]);
+              editor.enablePlugins([ 'bold' ]);
               editor.setHTML('<p><strong>Hello</strong></p>');
               expect(editor.plugins.bold).to.be.ok;
               expect(editor.getHTML('<p>Hello</p>'));
@@ -243,7 +243,7 @@
 
             it('should not reset the editable state of editor', () => {
               editor.editable = true;
-              editor.removePlugins([ 'bold ']);
+              editor.disablePlugins([ 'bold ']);
               expect(editor.editable).to.be.true;
             });
           });

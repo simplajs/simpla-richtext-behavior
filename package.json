@@ -1,6 +1,6 @@
 {
   "name": "simpla-richtext",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Behavior to add richtext editing to an element",
   "main": "simpla-richtext.html",
   "scripts": {

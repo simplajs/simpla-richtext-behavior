@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>simpla-richtext</title>
+
+    <!-- Setup WCT -->
+    <script src="https://unpkg.com/webcomponents.js@^0.7.24/webcomponents-lite.min.js"></script>
+    <script src="../../web-component-tester/browser.js"></script>
+
+    <!-- Import simpla-richtext  -->
+    <link rel="import" href="../simpla-richtext-behavior.html">
+
+  </head>
+  <body>
+    <test-fixture id="default">
+      <template>
+        <div></div>
+      </template>
+    </test-fixture>
+    <script>
+      import { TextSelection } from 'prosemirror-state';
+
+      const getView = editor => {
+        let symbols = Object.getOwnPropertySymbols(editor),
+            symbol = symbols.find(symbol => symbol.toString() === 'Symbol(view)');
+
+        return editor[symbol];
+      }
+
+      const selectInside = editor => (from, to) => {
+        let view = getView(editor),
+            state = view.state,
+            selection = TextSelection.create(state.doc, from, to);
+
+        view.updateState(state.apply(state.tr.setSelection(selection)));
+      };
+
+      describe('Richtext module', () => {
+        let editor,
+            element,
+            RichText;
+
+        before(() => {
+          RichText = window.SimplaBehaviors.RichText;
+        })
+
+        beforeEach(() => {
+          element = fixture('default');
+          editor = new RichText(element);
+        });
+
+        it('should be able to toggle editable', () => {
+          const isEditable = () => {
+            let editable = editor.element.contentEditable;
+            return editable === true || editable === 'true';
+          };
+
+          expect(editor.editable).to.be.false;
+          expect(isEditable()).to.be.false;
+
+          editor.editable = true;
+          expect(isEditable()).to.be.true;
+
+          editor.editable = false;
+          expect(isEditable()).to.be.false;
+        });
+
+        describe('plugins', () => {
+          let editor,
+              select;
+
+          beforeEach(() => {
+            editor = new RichText(
+              element,
+              {
+                plugins: [
+                  'link',
+                  'bold',
+                  'italic',
+                  'heading',
+                  'blockquote',
+                  'list',
+                  'image'
+                ]
+              }
+            )
+
+            select = selectInside(editor);
+          });
+
+          describe('set / get HTML', () => {
+            it('should set the HTML to the given value', () => {
+              editor.setHTML('<p>Hello World</p>');
+              expect(editor.getHTML()).to.equal('<p>Hello World</p>');
+            });
+
+            it('should strip tags if editor is inline', () => {
+              let inlineEditor = new RichText(element, { inline: true });
+
+              inlineEditor.setHTML('<p>Hello World</p>');
+              expect(inlineEditor.getHTML()).to.equal('Hello World');
+            });
+          });
+
+          describe('formatters', () => {
+            function testFormatter({ name, args, formatted, range = [ 1, 6 ] }) {
+              let unformatted = '<p>Hello World</p>';
+
+              editor.setHTML(unformatted);
+
+              select(...range);
+              editor.format(name, args);
+              expect(editor.getHTML()).to.equal(formatted);
+
+              select(...range);
+              editor.removeFormat(name);
+              expect(editor.getHTML(), 'removed formatting').to.equal(unformatted);
+
+              select(...range);
+              editor.toggleFormat(name, args);
+              expect(editor.getHTML(), 'toggled formatting on').to.equal(formatted);
+
+              select(...range);
+              editor.toggleFormat(name, args);
+              expect(editor.getHTML(), 'toggled formatting off').to.equal(unformatted);
+            }
+
+            describe('bold', () => {
+              it('should wrap / unwrap in `strong` tags', () => {
+                testFormatter({
+                  name: 'bold',
+                  formatted: '<p><strong>Hello</strong> World</p>'
+                })
+              })
+            });
+
+            describe('italic', () => {
+              it('should wrap / unwrap in `em` tags', () => {
+                testFormatter({
+                  name: 'italic',
+                  formatted: '<p><em>Hello</em> World</p>'
+                });
+              })
+            });
+
+            describe('link', () => {
+              it('should wrap / unwrap in `a` tags with correct href', () => {
+                testFormatter({
+                  name: 'link',
+                  formatted: '<p><a href="http://xkcd.com">Hello</a> World</p>',
+                  args: { href: 'http://xkcd.com' }
+                });
+              });
+            });
+
+            describe('heading', () => {
+              it('should replace `p` tag with `h1` when given no level', () => {
+                testFormatter({
+                  name: 'heading',
+                  formatted: '<h1>Hello World</h1>'
+                });
+              });
+
+              it('should replace `p` tag with `h{n}` when given level n', () => {
+                testFormatter({
+                  name: 'heading',
+                  formatted: '<h2>Hello World</h2>',
+                  args: { level: 2 }
+                });
+
+                testFormatter({
+                  name: 'heading',
+                  formatted: '<h3>Hello World</h3>',
+                  args: { level: 3 }
+                });
+              });
+            });
+
+            describe('blockquote', () => {
+              it('should wrap the current block in `blockquote` tags', () => {
+                testFormatter({
+                  name: 'blockquote',
+                  formatted: '<blockquote><p>Hello World</p></blockquote>',
+                  range: [ 2, 6 ]
+                });
+              });
+            });
+          });
+
+          describe('embeds', () => {
+            describe('image', () => {
+              it('should embed an image with correct attributes', () => {
+                let src = 'http://www.fillmurray.com/100/100',
+                    alt = 'Alternative Murray',
+                    title = 'Murray Title';
+
+                editor.setHTML('<p></p>');
+
+                select(1, 1);
+                editor.embed('image', { src, alt, title });
+
+                expect(editor.getHTML()).to.equal(
+                  `<p><img src="${src}" alt="${alt}" title="${title}"></p>`
+                );
+              });
+            });
+          });
+
+          describe('inputs', () => {
+            describe('lists', () => {
+              // Haven't yet figured out how to replicate natural typing in
+              //  prosemirror so this can't be tested yet
+              it('should embed a list when typeing "- " on a new line')
+            });
+          });
+
+          describe('adding / removing behavior', () => {
+            it('should be able to remove plugins after the fact', () => {
+              editor.removePlugins([ 'bold' ]);
+              editor.setHTML('<p><strong>Hello</strong></p>');
+              expect(editor.plugins.bold).to.not.be.ok;
+              expect(editor.getHTML()).to.equal('<p>Hello</p>');
+            });
+
+            it('should be able to add plugins after the fact', () => {
+              editor.removePlugins([ 'bold' ]);
+              editor.addPlugins([ 'bold' ]);
+              editor.setHTML('<p><strong>Hello</strong></p>');
+              expect(editor.plugins.bold).to.be.ok;
+              expect(editor.getHTML('<p>Hello</p>'));
+            });
+
+            it('should not reset the editable state of editor', () => {
+              editor.editable = true;
+              editor.removePlugins([ 'bold ']);
+              expect(editor.editable).to.be.true;
+            });
+          });
+        });
+      });
+    </script>
+  </body>
+</html>

@@ -97,7 +97,7 @@ export default class {
         onFocus: event => emit('focus', event),
         onInput: () => emit('input'),
         onSelect: (selection) => {
-          this[SELECTION] = selection ? null : this[VIEW].root.getSelection();
+          this[SELECTION] = selection ? this[VIEW].root.getSelection() : null;
           emit('select', { selection: this[SELECTION] });
         }
       })

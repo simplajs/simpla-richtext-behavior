@@ -18,6 +18,7 @@ import {
 } from 'prosemirror-commands';
 
 const DEFAULT_BLOCK_TYPE = 'paragraph';
+const respondWith = (value) => () => () => () => value;
 
 /**
  * Command to set the current text block to the given node
@@ -71,14 +72,14 @@ export function insertBr() {
  * @param  {object=}  attrs Optional attributes to pass to mark
  * @return {Function}       Command to apply to state
  */
-export const applyMark = ifThenElse(markIsApplied, () => false, toggleMark);
+export const applyMark = ifThenElse(markIsApplied, respondWith(false), toggleMark);
 
 /**
  * Remove mark with given name
  * @param  {string}   mark  Name of mark to remove
  * @return {Function}       Command to apply to state
  */
-export const removeMark = ifThenElse(markIsApplied, toggleMark, () => false);
+export const removeMark = ifThenElse(markIsApplied, toggleMark, respondWith(false));
 
 /**
  * Curried function which wraps the selected block in the given node, with
@@ -89,7 +90,7 @@ export const removeMark = ifThenElse(markIsApplied, toggleMark, () => false);
  */
 export const wrapIn = ifThenElse(
   wrappedIn,
-  () => false,
+  respondWith(false),
   convertNodeCommand(pmWrapIn)
 );
 
@@ -99,7 +100,7 @@ export const wrapIn = ifThenElse(
  * @param  {string}   node  Name of node to wrap block in
  * @return {Function}       Command to apply to state
  */
-export const unwrapFrom = ifThenElse(wrappedIn, () => () => lift, () => false);
+export const unwrapFrom = ifThenElse(wrappedIn, () => () => lift, respondWith(false));
 
 /**
  * Curried function which toggles the wrapping of the given node around the current

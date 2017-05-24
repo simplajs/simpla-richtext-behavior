@@ -24,13 +24,13 @@ export default function makeEventsPlugin(callbacks) {
         }
 
         if (state.selection !== selection) {
-          onSelect(selection);
-        }
-
-        if (tr.docChanged) {
           // Run callback in microtask queue so that the current transaction
           //  has been applied, if done immediately then view won't have updated
           //  yet
+          Promise.resolve().then(() => onSelect(selection));
+        }
+
+        if (tr.docChanged) {
           Promise.resolve().then(onInput);
         }
 

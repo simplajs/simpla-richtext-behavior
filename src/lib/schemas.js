@@ -27,7 +27,8 @@ const imgNode = {
   attrs: {
     src: {},
     alt: { default: null },
-    title: { default: null }
+    title: { default: null },
+    alignment: { default: 'center' }
   },
   group: 'block',
   draggable: true,
@@ -35,16 +36,34 @@ const imgNode = {
     {
       tag: 'img[src]',
       getAttrs(dom) {
-        return {
+        let attrs = {
           src: dom.getAttribute('src'),
           title: dom.getAttribute('title'),
           alt: dom.getAttribute('alt')
         };
+
+        if (dom.style.float === 'left' || dom.style.float === 'right') {
+          attrs.alignment = dom.style.float;
+        }
+
+        return attrs;
       }
     }
   ],
   toDOM(node) {
-    return ['img', node.attrs];
+    let { src, alt, title, alignment } = node.attrs, style = '';
+
+    switch (alignment) {
+    case 'center':
+      style = 'display: block; margin: 0 auto;';
+      break;
+    case 'left':
+    case 'right':
+      style = `float: ${alignment};`;
+      break;
+    }
+
+    return ['img', { src, alt, title, style }];
   }
 };
 

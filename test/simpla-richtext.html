@@ -32,6 +32,8 @@
             selection = type.create(state.doc, from, to);
 
         view.updateState(state.apply(state.tr.setSelection(selection)));
+
+        return selection;
       };
 
       describe('Richtext module', () => {
@@ -210,39 +212,71 @@
               it('should embed an image with correct attributes', () => {
                 let src = 'http://www.fillmurray.com/100/100',
                     alt = 'Alternative Murray',
-                    title = 'Murray Title';
+                    title = 'Murray Title',
+                    img;
 
                 editor.setHTML('<p></p>');
 
                 select(1, 1);
                 editor.embed('image', { src, alt, title });
 
-                expect(editor.getHTML()).to.equal(
-                  `<img src="${src}" alt="${alt}" title="${title}">`
-                );
+                img = editor.element.querySelector('img');
+
+                expect(img).to.be.ok;
+                expect(img.getAttribute('src')).to.equal(src);
+                expect(img.getAttribute('alt')).to.equal(alt);
+                expect(img.getAttribute('title')).to.equal(title);
+              });
+
+              it('should be able to embed given an alignment', () => {
+                let src = 'http://www.fillmurray.com/100/100',
+                    alt = 'Alternative Murray',
+                    title = 'Murray Title',
+                    alignment = 'left',
+                    img;
+
+                editor.setHTML('<p></p>');
+
+                select(1, 1);
+                editor.embed('image', { src, alt, title, alignment });
+
+                img = editor.element.querySelector('img');
+                expect(img.getAttribute('style')).to.match(/float:\s+left/);
+              });
+
+              it('should be able to parse given imgs alignment', () => {
+                let src = 'http://www.fillmurray.com/100/100',
+                    alt = 'Murray',
+                    title = 'Murray Title',
+                    node;
+
+                editor.setHTML(`<img src="${src}" alt="${alt}" title="${title}" style="float: left;">`);
+
+                ({ node } = selectNode(0));
+
+                expect(node.attrs.alignment).to.equal('left');
               });
 
               it('should be able to replace a current img', () => {
                 let src = 'http://www.fillmurray.com/100/100',
                     initialAlt = 'Murray',
                     updatedAlt = 'Murray 2',
-                    title = 'Murray Title';
+                    title = 'Murray Title',
+                    img;
 
                 editor.setHTML(`<img src="${src}" alt="${initialAlt}" title="${title}">`);
 
                 selectNode(0);
                 editor.embed('image', { src, alt: updatedAlt, title });
 
-                expect(editor.getHTML()).to.equal(
-                  `<img src="${src}" alt="${updatedAlt}" title="${title}">`
-                );
+                img = editor.element.querySelector('img');
+                expect(img.getAttribute('alt')).to.equal(updatedAlt);
               });
 
               it('should not be applicable when selection is in text', () => {
                 editor.setHTML('<p>Hello World</p>');
                 select(4, 4);
 
-                debugger;
                 expect(editor.plugins.image.applicable).to.be.false;
               });
             });

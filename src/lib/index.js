@@ -49,13 +49,7 @@ export default class {
   }
 
   [SETUP]({ editable } = {}) {
-    let doc,
-        schema,
-        emit,
-        state,
-        customPlugins,
-        editablePlugin,
-        plugins;
+    let doc, schema, emit, state, customPlugins, editablePlugin, plugins;
 
     customPlugins = this[SELECTED_PLUGINS];
     this[PLUGINS] = customPlugins.reduce((asObj, name) => {
@@ -86,7 +80,7 @@ export default class {
       getCustomPlugins({
         schema,
         plugins: customPlugins,
-        onChange: (plugin) => {
+        onChange: plugin => {
           this[PLUGINS][plugin.name] = plugin;
           emit('plugin', plugin);
         }
@@ -97,7 +91,7 @@ export default class {
         onBlur: event => emit('blur', event),
         onFocus: event => emit('focus', event),
         onInput: () => emit('input'),
-        onSelect: (selection) => {
+        onSelect: selection => {
           this[SELECTION] = selection ? this[VIEW].root.getSelection() : null;
           emit('select', { selection: this[SELECTION] });
         }
@@ -147,6 +141,31 @@ export default class {
 
   get plugins() {
     return this[PLUGINS];
+  }
+
+  /**
+   * Get bounds of the current selection
+   * @return {Object} Bounds rectangle. Same interface as DOMRect
+   */
+  getSelectionBounds() {
+    const view = this[VIEW], selection = view.state.selection;
+
+    const mergeRects = (a, b) => ({
+      top: Math.round(Math.min(a.top, b.top)),
+      left: Math.round(Math.min(a.left, b.right)),
+      bottom: Math.round(Math.max(a.bottom, b.bottom)),
+      right: Math.round(Math.max(a.right, b.right))
+    });
+
+    let fromRect = view.coordsAtPos(selection.from),
+        toRect = view.coordsAtPos(selection.to),
+        bounds;
+
+    bounds = mergeRects(fromRect, toRect);
+    bounds.width = bounds.right - bounds.left;
+    bounds.height = bounds.bottom - bounds.top;
+
+    return bounds;
   }
 
   /**
@@ -254,10 +273,9 @@ export default class {
    * @return {undefined}
    */
   enablePlugins(plugins) {
-    let current = this[SELECTED_PLUGINS],
-        notAlreadySelected;
+    let current = this[SELECTED_PLUGINS], notAlreadySelected;
 
-    notAlreadySelected = (plugin) => current.indexOf(plugin) === -1;
+    notAlreadySelected = plugin => current.indexOf(plugin) === -1;
 
     this[SELECTED_PLUGINS] = plugins.filter(notAlreadySelected).concat(current);
 
@@ -270,7 +288,7 @@ export default class {
    * @return {undefined}
    */
   disablePlugins(plugins) {
-    let toKeep = (plugin) => plugins.indexOf(plugin) === -1;
+    let toKeep = plugin => plugins.indexOf(plugin) === -1;
 
     this[SELECTED_PLUGINS] = this[SELECTED_PLUGINS].filter(toKeep);
 
@@ -278,8 +296,7 @@ export default class {
   }
 
   [WITH_PLUGIN](name, fn, options) {
-    let { state, dispatch } = this[VIEW],
-        definition;
+    let { state, dispatch } = this[VIEW], definition;
 
     for (let i = 0, k = state.plugins.length; i < k && !definition; i++) {
       if (state.plugins[i].name === name) {

@@ -12,18 +12,14 @@ export default function makeEventsPlugin(callbacks) {
     },
 
     state: {
-      init: () => ({ selection: null }),
+      init: (config, state) => ({ selection: state.selection }),
 
       apply: (tr, state, oldDocState, newDocState) => {
         let selection;
 
-        if (newDocState.selection.empty) {
-          selection = null;
-        } else {
-          selection = newDocState.selection;
-        }
+        selection = newDocState.selection;
 
-        if (state.selection !== selection) {
+        if (!state.selection.eq(selection)) {
           // Run callback in microtask queue so that the current transaction
           //  has been applied, if done immediately then view won't have updated
           //  yet

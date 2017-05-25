@@ -91,8 +91,8 @@ export default class {
         onBlur: event => emit('blur', event),
         onFocus: event => emit('focus', event),
         onInput: () => emit('input'),
-        onSelect: selection => {
-          this[SELECTION] = selection ? this[VIEW].root.getSelection() : null;
+        onSelect: () => {
+          this[SELECTION] = this[VIEW].root.getSelection();
           emit('select', { selection: this[SELECTION] });
         }
       })
@@ -105,6 +105,8 @@ export default class {
     } else {
       this[VIEW] = new EditorView({ mount: this.element }, { state });
     }
+
+    this[SELECTION] = this[VIEW].root.getSelection();
   }
 
   get editable() {

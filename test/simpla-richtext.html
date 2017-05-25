@@ -257,6 +257,20 @@
                 expect(node.attrs.alignment).to.equal('left');
               });
 
+              it('should reflect alignment in a data attribute', () => {
+                let src = 'http://www.fillmurray.com/100/100',
+                    alignment = 'left',
+                    img;
+
+                editor.setHTML('<p></p>');
+
+                select(1, 1);
+                editor.embed('image', { src, alignment });
+
+                img = editor.element.querySelector('img');
+                expect(img.dataset.alignment).to.equal(alignment);
+              });
+
               it('should be able to replace a current img', () => {
                 let src = 'http://www.fillmurray.com/100/100',
                     initialAlt = 'Murray',

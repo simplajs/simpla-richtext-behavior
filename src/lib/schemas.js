@@ -63,7 +63,7 @@ const imgNode = {
       break;
     }
 
-    return ['img', { src, alt, title, style }];
+    return ['img', { src, alt, title, style, 'data-alignment': alignment }];
   }
 };
 

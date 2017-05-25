@@ -55,7 +55,7 @@ const imgNode = {
 
     switch (alignment) {
     case 'center':
-      style = 'display: block; margin: 0 auto;';
+      style = 'display: block; margin-left: auto; margin-right: auto;';
       break;
     case 'left':
     case 'right':

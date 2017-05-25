@@ -127,3 +127,30 @@ export const toggleWrapping = ifThenElse(wrappedIn, unwrapFrom, wrapIn);
  *  of 2.
  */
 export const splitListItem = convertNodeCommand(baseSplitListItem);
+
+/**
+ * Replace current block with a block of the given node
+ * @param  {String}  node   Node to replace current block with
+ * @param  {Object=} attrs  Optional attributes to give to node
+ * @return {Function}       Command to apply to state
+ */
+const replaceCurrentBlock = node => attrs => (state, dispatch) => {
+  let nodeType = state.schema.nodes[node];
+
+  dispatch(state.tr.replaceSelectionWith(nodeType.createAndFill(attrs)));
+
+  return true;
+};
+
+/**
+ * Embed the given node into the current state. Embeds can replace current blocks
+ *  or swap the current block to the given node
+ * @param  {string}   node  Name of node to embed
+ * @param  {Object=}  attrs Optional attributes to pass to the node if wrapping
+ * @return {Function}       Command to apply to state
+ */
+export const embed = ifThenElse(
+  currentBlockIs,
+  replaceCurrentBlock,
+  setBlockTo
+);

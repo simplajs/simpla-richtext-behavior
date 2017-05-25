@@ -307,7 +307,11 @@ export default class {
     }
 
     if (!definition) {
-      throw new Error(`Plugin for '${name}' not found`);
+      throw new Error(`${definition.type} for '${name}' not found`);
+    }
+
+    if (!this.plugins[name].applicable) {
+      throw new Error(`${definition.type} not currently applicable`);
     }
 
     return definition[fn](options)(state, dispatch);

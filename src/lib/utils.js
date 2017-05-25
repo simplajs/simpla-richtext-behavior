@@ -251,25 +251,7 @@ export const convertNodeCommand = convertPmCommand('nodes');
 const isEmptyBlock = state => {
   let block = getCurrentBlock(state);
 
-  return block.content.size === 0;
-};
-
-/**
- * Checks if the given node can replace the current selection
- * @param  {string} node Name of node to check
- * @return {Function}    Function which takes a state and return true if can
- *                         replace current selection with given node, false otherwise
- */
-const canReplace = node => state => {
-  let $from = state.selection.$from, nodeType = state.schema.nodes[node];
-
-  for (let d = $from.depth; d >= 0; d--) {
-    let index = $from.index(d);
-
-    if ($from.node(d).canReplaceWith(index, index, nodeType)) {
-      return true;
-    }
-  }
+  return block && block.content.size === 0;
 };
 
 /**
@@ -290,7 +272,9 @@ const atDepth = depth => state => {
  *                         embed given node into given state
  */
 export const canEmbed = node => state => {
-  return atDepth(1)(state) && isEmptyBlock(state) && canReplace(node)(state);
+  return (
+    atDepth(1)(state) && isEmptyBlock(state) || currentBlockIs(node)(state)
+  );
 };
 
 /**
@@ -315,7 +299,7 @@ export const attrsFor = getter => state => {
 export const privateKey = (() => {
   let map = {};
 
-  return (description) => {
+  return description => {
     if (window.Symbol) {
       return Symbol(description);
     }
@@ -323,5 +307,5 @@ export const privateKey = (() => {
     map[description] = map[description] ? map[description] + 1 : 0;
 
     return `__${description}$${map[description]}`;
-  }
+  };
 })();

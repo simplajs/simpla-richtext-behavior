@@ -8,9 +8,6 @@
     <script src="https://unpkg.com/webcomponents.js@^0.7.24/webcomponents-lite.min.js"></script>
     <script src="../../web-component-tester/browser.js"></script>
 
-    <!-- Import simpla-richtext  -->
-    <link rel="import" href="../simpla-richtext-behavior.html">
-
   </head>
   <body>
     <test-fixture id="default">
@@ -19,7 +16,8 @@
       </template>
     </test-fixture>
     <script>
-      import { TextSelection } from 'prosemirror-state';
+      import RichText from '../src/lib';
+      import { TextSelection, NodeSelection } from 'prosemirror-state';
 
       const getView = editor => {
         let symbols = Object.getOwnPropertySymbols(editor),
@@ -28,22 +26,17 @@
         return editor[symbol];
       }
 
-      const selectInside = editor => (from, to) => {
+      const selectInside = (editor, type = TextSelection) => (from, to) => {
         let view = getView(editor),
             state = view.state,
-            selection = TextSelection.create(state.doc, from, to);
+            selection = type.create(state.doc, from, to);
 
         view.updateState(state.apply(state.tr.setSelection(selection)));
       };
 
       describe('Richtext module', () => {
         let editor,
-            element,
-            RichText;
-
-        before(() => {
-          RichText = window.SimplaBehaviors.RichText;
-        })
+            element;
 
         beforeEach(() => {
           element = fixture('default');
@@ -76,9 +69,24 @@
           });
         });
 
+        describe('set / get HTML', () => {
+          it('should set the HTML to the given value', () => {
+            editor.setHTML('<p>Hello World</p>');
+            expect(editor.getHTML()).to.equal('<p>Hello World</p>');
+          });
+
+          it('should strip tags if editor is inline', () => {
+            let inlineEditor = new RichText(element, { inline: true });
+
+            inlineEditor.setHTML('<p>Hello World</p>');
+            expect(inlineEditor.getHTML()).to.equal('Hello World');
+          });
+        });
+
         describe('plugins', () => {
           let editor,
-              select;
+              select,
+              selectNode;
 
           beforeEach(() => {
             editor = new RichText(
@@ -97,19 +105,18 @@
             )
 
             select = selectInside(editor);
+            selectNode = selectInside(editor, NodeSelection);
           });
 
-          describe('set / get HTML', () => {
-            it('should set the HTML to the given value', () => {
-              editor.setHTML('<p>Hello World</p>');
-              expect(editor.getHTML()).to.equal('<p>Hello World</p>');
-            });
+          describe('when not applicable', () => {
+            it('should throw', () => {
+              let format = () => editor.format('bold');
 
-            it('should strip tags if editor is inline', () => {
-              let inlineEditor = new RichText(element, { inline: true });
+              editor.plugins.bold.applicable = false;
+              expect(format).to.throw();
 
-              inlineEditor.setHTML('<p>Hello World</p>');
-              expect(inlineEditor.getHTML()).to.equal('Hello World');
+              editor.plugins.bold.applicable = true;
+              expect(format).not.to.throw();
             });
           });
 
@@ -213,6 +220,30 @@
                 expect(editor.getHTML()).to.equal(
                   `<img src="${src}" alt="${alt}" title="${title}">`
                 );
+              });
+
+              it('should be able to replace a current img', () => {
+                let src = 'http://www.fillmurray.com/100/100',
+                    initialAlt = 'Murray',
+                    updatedAlt = 'Murray 2',
+                    title = 'Murray Title';
+
+                editor.setHTML(`<img src="${src}" alt="${initialAlt}" title="${title}">`);
+
+                selectNode(0);
+                editor.embed('image', { src, alt: updatedAlt, title });
+
+                expect(editor.getHTML()).to.equal(
+                  `<img src="${src}" alt="${updatedAlt}" title="${title}">`
+                );
+              });
+
+              it('should not be applicable when selection is in text', () => {
+                editor.setHTML('<p>Hello World</p>');
+                select(4, 4);
+
+                debugger;
+                expect(editor.plugins.image.applicable).to.be.false;
               });
             });
           });

@@ -12,7 +12,8 @@ import {
   unwrapFrom,
   toggleWrapping,
   resetBlock,
-  splitListItem
+  splitListItem,
+  embed
 } from '../commands';
 import {
   markIsApplied,
@@ -91,7 +92,7 @@ export const list = {
 export const image = {
   name: 'image',
   type: EMBED,
-  embed: setBlockTo('image'),
+  embed: embed('image'),
   isApplicable: canEmbed('image'),
   isApplied: currentBlockIs('image'),
   getMeta: attrsFor(getCurrentBlock)

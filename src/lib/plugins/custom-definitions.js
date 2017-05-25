@@ -12,8 +12,7 @@ import {
   unwrapFrom,
   toggleWrapping,
   resetBlock,
-  splitListItem,
-  embed
+  splitListItem
 } from '../commands';
 import {
   markIsApplied,
@@ -29,9 +28,7 @@ import {
   canEmbed
 } from '../utils';
 
-const FORMAT = 'Format',
-      EMBED = 'Embed',
-      INPUT = 'Input';
+const FORMAT = 'Format', EMBED = 'Embed', INPUT = 'Input';
 
 function makeMarkPlugin({ name, keys }) {
   return {
@@ -94,7 +91,7 @@ export const list = {
 export const image = {
   name: 'image',
   type: EMBED,
-  embed: embed('image'),
+  embed: setBlockTo('image'),
   isApplicable: canEmbed('image'),
   isApplied: currentBlockIs('image'),
   getMeta: attrsFor(getCurrentBlock)

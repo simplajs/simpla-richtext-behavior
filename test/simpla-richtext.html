@@ -211,7 +211,7 @@
                 editor.embed('image', { src, alt, title });
 
                 expect(editor.getHTML()).to.equal(
-                  `<p><img src="${src}" alt="${alt}" title="${title}"></p>`
+                  `<img src="${src}" alt="${alt}" title="${title}">`
                 );
               });
             });

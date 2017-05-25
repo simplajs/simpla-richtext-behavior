@@ -35,7 +35,7 @@ function makeMarkPlugin({ name, keys }) {
   return {
     name,
     type: FORMAT,
-    keymap: { [keys]: toggleMark(name)() },
+    keymap: keys ? { [keys]: toggleMark(name)() } : undefined,
     toggle: toggleMark(name),
     apply: applyMark(name),
     remove: removeMark(name),

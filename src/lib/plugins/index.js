@@ -1,24 +1,16 @@
-import getKeymapPlugin from './keymap';
-import getCustomPlugins from './custom';
-import getPlaceholderPlugin from './placeholder';
-import getEventsPlugin from './events';
-import getEditablePlugin from './editable';
+export { default as getKeymapPlugin } from './keymap';
+export { default as getCustomPlugins } from './custom';
+export { default as getPlaceholderPlugin } from './placeholder';
+export { default as getEventsPlugin } from './events';
+export { default as getEditablePlugin } from './editable';
+export { history as getHistoryPlugin } from 'prosemirror-history';
 import {
   inputRules as makeInputRules,
   allInputRules
 } from 'prosemirror-inputrules';
 
-function getInputRules(opts = {}) {
+export function getInputRules(opts = {}) {
   let { rules = allInputRules } = opts;
 
   return makeInputRules({ rules });
 }
-
-export {
-  getKeymapPlugin,
-  getCustomPlugins,
-  getEventsPlugin,
-  getPlaceholderPlugin,
-  getEditablePlugin,
-  getInputRules
-};

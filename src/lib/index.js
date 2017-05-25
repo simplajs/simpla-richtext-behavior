@@ -7,7 +7,8 @@ import {
   getEventsPlugin,
   getInputRules,
   getKeymapPlugin,
-  getEditablePlugin
+  getEditablePlugin,
+  getHistoryPlugin
 } from './plugins';
 import { flatten, mergeSchemaSpecs, privateKey } from './utils';
 import * as schemas from './schemas';
@@ -85,6 +86,7 @@ export default class {
           emit('plugin', plugin);
         }
       }),
+      getHistoryPlugin(),
       getKeymapPlugin({ inline: this.inline }),
       getPlaceholderPlugin({ text: this.placeholder }),
       getEventsPlugin({

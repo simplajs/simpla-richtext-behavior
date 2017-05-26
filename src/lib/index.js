@@ -93,9 +93,13 @@ export default class {
         onBlur: event => emit('blur', event),
         onFocus: event => emit('focus', event),
         onInput: () => emit('input'),
-        onSelect: () => {
-          this[SELECTION] = this[VIEW].root.getSelection();
-          emit('select', { selection: this[SELECTION] });
+        onSelect: (selection) => {
+          this[SELECTION] = {
+            native: this[VIEW].root.getSelection(),
+            empty: selection.empty
+          };
+
+          emit('select', this[SELECTION]);
         }
       })
     ]);
@@ -152,11 +156,13 @@ export default class {
    * @return {Object} Bounds rectangle. Same interface as DOMRect
    */
   getSelectionBounds() {
-    const view = this[VIEW], selection = view.state.selection;
+    const view = this[VIEW],
+          selection = view.state.selection,
+          { native, empty } = this.selection;
 
     let top, left, right, bottom, width, height;
 
-    if (selection.empty) {
+    if (empty) {
       ({
         top,
         left,
@@ -167,8 +173,7 @@ export default class {
       width = right - left;
       height = bottom - top;
     } else {
-      let nativeSelection = view.root.getSelection(),
-          range = nativeSelection.rangeCount && nativeSelection.getRangeAt(0);
+      let range = native.rangeCount && native.getRangeAt(0);
 
       ({
         top,

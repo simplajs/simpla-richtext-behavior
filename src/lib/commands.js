@@ -154,9 +154,9 @@ const replaceCurrentBlock = node => attrs => (state, dispatch) => {
  */
 const insertBlockBefore = node => attrs => (state, dispatch) => {
   let nodeType = state.schema.nodes[node],
-      { from, to } = state.selection;
+      { from } = state.selection;
 
-  dispatch(state.tr.insert(Math.min(from, to) - 1, nodeType.createAndFill(attrs)));
+  dispatch(state.tr.insert(from - 1, nodeType.createAndFill(attrs)));
 
   return true;
 }

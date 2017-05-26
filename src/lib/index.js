@@ -154,22 +154,33 @@ export default class {
   getSelectionBounds() {
     const view = this[VIEW], selection = view.state.selection;
 
-    const mergeRects = (a, b) => ({
-      top: Math.round(Math.min(a.top, b.top)),
-      left: Math.round(Math.min(a.left, b.right)),
-      bottom: Math.round(Math.max(a.bottom, b.bottom)),
-      right: Math.round(Math.max(a.right, b.right))
-    });
+    let top, left, right, bottom, width, height;
 
-    let fromRect = view.coordsAtPos(selection.from),
-        toRect = view.coordsAtPos(selection.to),
-        bounds;
+    if (selection.empty) {
+      ({
+        top,
+        left,
+        right,
+        bottom
+      } = view.coordsAtPos(selection.from));
 
-    bounds = mergeRects(fromRect, toRect);
-    bounds.width = bounds.right - bounds.left;
-    bounds.height = bounds.bottom - bounds.top;
+      width = right - left;
+      height = bottom - top;
+    } else {
+      let nativeSelection = view.root.getSelection(),
+          range = nativeSelection.rangeCount && nativeSelection.getRangeAt(0);
 
-    return bounds;
+      ({
+        top,
+        left,
+        right,
+        bottom,
+        width,
+        height
+      } = range.getBoundingClientRect());
+    }
+
+    return { top, left, bottom, right, width, height };
   }
 
   /**

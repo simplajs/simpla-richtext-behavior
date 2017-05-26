@@ -143,14 +143,25 @@ const replaceCurrentBlock = node => attrs => (state, dispatch) => {
 };
 
 /**
+ * Insert block of given node type before current block
+ * @param  {String}  node   Block node to insert
+ * @param  {Object=} attrs  Optional attributes to give to node
+ * @return {Function}       Command to apply to state
+ */
+const insertBlockBefore = node => attrs => (state, dispatch) => {
+  let nodeType = state.schema.nodes[node],
+      { from, to } = state.selection;
+
+  dispatch(state.tr.insert(Math.min(from, to) - 1, nodeType.createAndFill(attrs)));
+
+  return true;
+}
+
+/**
  * Embed the given node into the current state. Embeds can replace current blocks
  *  or swap the current block to the given node
  * @param  {string}   node  Name of node to embed
  * @param  {Object=}  attrs Optional attributes to pass to the node if wrapping
  * @return {Function}       Command to apply to state
  */
-export const embed = ifThenElse(
-  currentBlockIs,
-  replaceCurrentBlock,
-  setBlockTo
-);
+export const embed = ifThenElse(currentBlockIs, replaceCurrentBlock, insertBlockBefore);

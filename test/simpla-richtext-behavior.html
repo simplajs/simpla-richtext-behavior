@@ -293,6 +293,31 @@
 
                 expect(editor.plugins.image.applicable).to.be.false;
               });
+
+              it('should add a new line after insertion', () => {
+                let src = 'http://www.fillmurray.com/100/100',
+                    isAfter,
+                    img,
+                    p;
+
+                editor.setHTML('<p></p>');
+
+                select(1, 1);
+                editor.embed('image', { src });
+
+                img = editor.element.querySelector('img');
+                p = editor.element.querySelector('p');
+
+                expect(img).to.be.ok;
+                expect(p).to.be.ok;
+
+                isAfter = !!(
+                  img.compareDocumentPosition(p) &
+                  Node.DOCUMENT_POSITION_FOLLOWING
+                );
+
+                expect(isAfter).to.be.true;
+              });
             });
           });
 

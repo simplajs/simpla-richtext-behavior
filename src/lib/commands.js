@@ -1,3 +1,4 @@
+import { NodeSelection } from 'prosemirror-state';
 import { splitListItem as baseSplitListItem } from 'prosemirror-schema-list';
 import {
   convertMarkCommand,
@@ -135,9 +136,12 @@ export const splitListItem = convertNodeCommand(baseSplitListItem);
  * @return {Function}       Command to apply to state
  */
 const replaceCurrentBlock = node => attrs => (state, dispatch) => {
-  let nodeType = state.schema.nodes[node];
+  let nodeType = state.schema.nodes[node],
+      tr = state.tr.replaceSelectionWith(nodeType.createAndFill(attrs));
 
-  dispatch(state.tr.replaceSelectionWith(nodeType.createAndFill(attrs)));
+  dispatch(
+    tr.setSelection(NodeSelection.create(tr.doc, state.selection.from))
+  );
 
   return true;
 };

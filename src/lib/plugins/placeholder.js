@@ -74,6 +74,13 @@ function createStyleWidget(state) {
   });
 }
 
+function resetCursor(view) {
+  let insideFirstNode = view.state.doc.content.size > 0 ? 1 : 0,
+      selection = TextSelection.create(view.state.doc, insideFirstNode);
+
+  view.dispatch(view.state.tr.setSelection(selection));
+}
+
 export default function makePlaceholderPlugin({ text }) {
   return new Plugin({
     key: pluginKey,
@@ -93,10 +100,7 @@ export default function makePlaceholderPlugin({ text }) {
     props: {
       onFocus(view) {
         if (shouldBeShowingPlaceholder(view.state)) {
-          let insideFirstNode = view.state.doc.content.size > 0 ? 1 : 0,
-              selection = TextSelection.create(view.state.doc, insideFirstNode);
-
-          view.dispatch(view.state.tr.setSelection(selection));
+          resetCursor(view);
         }
       },
 
@@ -106,6 +110,23 @@ export default function makePlaceholderPlugin({ text }) {
             createPlaceholderWidget(state, text),
             createStyleWidget(state)
           ]);
+        }
+      },
+
+      handleClick(view) {
+        if (view.hasFocus() && shouldBeShowingPlaceholder(view.state)) {
+          resetCursor(view);
+          return true;
+        }
+      },
+
+      handleKeyDown(view, event) {
+        let focused = view.hasFocus(),
+            showingPlaceholder = shouldBeShowingPlaceholder(view.state),
+            isLeftOrRight = event.keyCode === 37 || event.keyCode === 39;
+
+        if (focused && showingPlaceholder && isLeftOrRight) {
+          return true;
         }
       }
     },

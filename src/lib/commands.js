@@ -1,4 +1,5 @@
 import { NodeSelection } from 'prosemirror-state';
+import { liftTarget, findWrapping } from 'prosemirror-transform';
 import { splitListItem as baseSplitListItem } from 'prosemirror-schema-list';
 import {
   convertMarkCommand,
@@ -10,11 +11,10 @@ import {
 } from './utils';
 import {
   toggleMark as pmToggleMark,
-  wrapIn as pmWrapIn,
   chainCommands,
   setBlockType,
   exitCode,
-  lift
+  lift as pmLift
 } from 'prosemirror-commands';
 
 const DEFAULT_BLOCK_TYPE = 'paragraph';
@@ -90,6 +90,41 @@ export const removeMark = ifThenElse(
 );
 
 /**
+ * Attempts to lift the current text block, if it can, then finally wraps the
+ *  text block in the given node type
+ * @param  {string}   node  Name of node to wrap block in
+ * @param  {Object=}  attrs Optional attributes to pass to the node
+ * @return {Function}       Command to apply to state
+ */
+export const liftThenWrap = node => attrs => (state, dispatch) => {
+  let nodeType = state.schema.nodes[node],
+      { $from, $to } = state.selection,
+      range = $from.blockRange($to),
+      target = range && liftTarget(range),
+      tr = state.tr,
+      wrapping;
+
+  if (target !== null) {
+    tr.lift(range, target);
+  }
+
+  ({ $from, $to } = tr.selection);
+  range = $from.blockRange($to);
+
+  wrapping = range && findWrapping(range, nodeType, attrs);
+
+  if (!wrapping) {
+    return false
+  }
+
+  if (dispatch) {
+    dispatch(tr.wrap(range, wrapping).scrollIntoView())
+  }
+
+  return true;
+}
+
+/**
  * Curried function which wraps the selected block in the given node, with
  *  given attributes
  * @param  {string}   node  Name of node to wrap block in
@@ -99,7 +134,7 @@ export const removeMark = ifThenElse(
 export const wrapIn = ifThenElse(
   wrappedIn,
   respondWith(false),
-  convertNodeCommand(pmWrapIn)
+  liftThenWrap
 );
 
 /**
@@ -110,7 +145,7 @@ export const wrapIn = ifThenElse(
  */
 export const unwrapFrom = ifThenElse(
   wrappedIn,
-  () => () => lift,
+  () => () => pmLift,
   respondWith(false)
 );
 

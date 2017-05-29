@@ -205,6 +205,47 @@
                 });
               });
             });
+
+            describe('blockquotes in lists', () => {
+              it('should replace the current content with a blockquote', () => {
+                let lists,
+                    blockquote,
+                    afterFirst,
+                    beforeLast;
+
+                editor.setHTML(`
+<p>
+  <ul>
+    <li><p>one</p></li>
+    <li><p>two</p></li>
+    <li><p>three</p></li>
+  </ul>
+</p>`);
+                select(15, 16);
+
+                expect(editor.plugins.blockquote.applicable, 'to be applicable').to.be.true;
+
+                editor.format('blockquote');
+
+                lists = document.querySelectorAll('ul');
+                expect(lists, 'lists to have been split').to.have.lengthOf(2);
+
+                blockquote = document.querySelector('blockquote');
+
+                afterFirst = !!(
+                  blockquote.compareDocumentPosition(lists[0]) &
+                  Node.DOCUMENT_POSITION_PRECEDING
+                );
+
+                beforeLast = !!(
+                  blockquote.compareDocumentPosition(lists[1]) &
+                  Node.DOCUMENT_POSITION_FOLLOWING
+                );
+
+                expect(afterFirst, 'blockquote after first list').to.be.true;
+                expect(beforeLast, 'blockquote before last list').to.be.true;
+              });
+            });
           });
 
           describe('embeds', () => {

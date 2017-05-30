@@ -4,7 +4,8 @@
   "description": "Behavior to add richtext editing to an element",
   "main": "simpla-richtext.html",
   "scripts": {
-    "test": "gulp test:local"
+    "test": "gulp test:local",
+    "build:tests": "gulp build:tests"
   },
   "author": "Simpla",
   "license": "MIT",

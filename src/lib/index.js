@@ -112,7 +112,10 @@ export default class {
       this[VIEW] = new EditorView({ mount: this.element }, { state });
     }
 
-    this[SELECTION] = this[VIEW].root.getSelection();
+    this[SELECTION] = {
+      native: this[VIEW].root.getSelection(),
+      empty: state.selection.empty
+    }
   }
 
   get editable() {

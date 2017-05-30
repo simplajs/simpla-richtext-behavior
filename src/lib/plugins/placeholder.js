@@ -1,7 +1,8 @@
 import { TextSelection, Plugin, PluginKey } from 'prosemirror-state';
 import { Decoration, DecorationSet } from 'prosemirror-view';
 
-const CLASS_NAME = 'simpla-text-placeholder',
+const ZERO_WIDTH_SPACE = '\u200B',
+      CLASS_NAME = 'simpla-text-placeholder',
       ATTRIBUTE_NAME = 'data-placeholder',
       STYLE_RULES = `
 .${CLASS_NAME} {
@@ -60,6 +61,14 @@ function handleViewChange(view) {
   }
 }
 
+function createPaddingWidget(state) {
+  return Decoration.widget(
+    getFirstNodeSpace(state),
+    document.createTextNode(ZERO_WIDTH_SPACE),
+    { key: 'padding' }
+  )
+}
+
 function createPlaceholderWidget(state, text) {
   return Decoration.widget(
     getFirstNodeSpace(state),
@@ -69,9 +78,11 @@ function createPlaceholderWidget(state, text) {
 }
 
 function createStyleWidget(state) {
-  return Decoration.widget(getFirstNodeSpace(state), createStylingNode(), {
-    key: 'placeholder-styles'
-  });
+  return Decoration.widget(
+    getFirstNodeSpace(state),
+    createStylingNode(),
+    { key: 'placeholder-styles' }
+  );
 }
 
 export default function makePlaceholderPlugin({ text }) {
@@ -91,21 +102,23 @@ export default function makePlaceholderPlugin({ text }) {
     },
 
     props: {
-      onFocus(view) {
-        if (shouldBeShowingPlaceholder(view.state)) {
+      decorations(state) {
+        if (shouldBeShowingPlaceholder(state)) {
+          return DecorationSet.create(state.doc, [
+            createPaddingWidget(state),
+            createPlaceholderWidget(state, text),
+            createStyleWidget(state)
+          ]);
+        }
+      },
+
+      handleClick(view, pos, event) {
+        let fromPlaceholder = event.target.classList.contains(CLASS_NAME);
+        if (fromPlaceholder) {
           let insideFirstNode = view.state.doc.content.size > 0 ? 1 : 0,
               selection = TextSelection.create(view.state.doc, insideFirstNode);
 
           view.dispatch(view.state.tr.setSelection(selection));
-        }
-      },
-
-      decorations(state) {
-        if (shouldBeShowingPlaceholder(state)) {
-          return DecorationSet.create(state.doc, [
-            createPlaceholderWidget(state, text),
-            createStyleWidget(state)
-          ]);
         }
       }
     },

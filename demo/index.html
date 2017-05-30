@@ -41,6 +41,11 @@
       }
 
       /* Add element styles here */
+      .editor {
+        outline: none;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+      }
     </style>
   </head>
 
@@ -51,11 +56,11 @@
         <h1 class="demo__title">Basic demo</h1>
         <demo-snippet>
           <template>
-            <div class="editor" style="outline: none;"></div>
+            <div class="editor block"></div>
 
             <script type="text/javascript">
               let editor = new SimplaBehaviors.RichText(
-                document.querySelector('.editor'),
+                document.querySelector('.block.editor'),
                 {
                   placeholder: 'Enter some text...',
                   plugins: [
@@ -80,11 +85,11 @@
         <h1 class="demo__title">Inline demo</h1>
         <demo-snippet>
           <template>
-            <div class="inline-editor" style="outline: none;"></div>
+            <div class="editor inline"></div>
 
             <script type="text/javascript">
               let inlineEditor = new SimplaBehaviors.RichText(
-                document.querySelector('.inline-editor'),
+                document.querySelector('.inline.editor'),
                 {
                   placeholder: 'Enter some text...',
                   inline: true

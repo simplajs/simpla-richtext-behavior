@@ -160,35 +160,31 @@ export default class {
    */
   getSelectionBounds() {
     const view = this[VIEW],
-          selection = view.state.selection,
-          { native, empty } = this.selection;
+          selection = view.state.selection;
 
-    let top, left, right, bottom, width, height;
+    let top, left, right, bottom, fromBox, toBox;
 
-    if (empty) {
-      ({
-        top,
-        left,
-        right,
-        bottom
-      } = view.coordsAtPos(selection.from));
+    fromBox = view.coordsAtPos(selection.from);
+    toBox = view.coordsAtPos(selection.to);
 
-      width = right - left;
-      height = bottom - top;
-    } else {
-      let range = native.rangeCount && native.getRangeAt(0);
+    top = Math.min(fromBox.top, toBox.top);
+    bottom = Math.max(fromBox.bottom, toBox.bottom);
+    left = Math.min(fromBox.left, toBox.left);
+    right = Math.max(fromBox.right, toBox.right);
 
-      ({
-        top,
-        left,
-        right,
-        bottom,
-        width,
-        height
-      } = range.getBoundingClientRect());
+    if (fromBox.top !== toBox.top) {
+      // They're on different lines, so just get borders of the element
+      ({ left, right } = this.element.getBoundingClientRect());
     }
 
-    return { top, left, bottom, right, width, height };
+    return {
+      top,
+      bottom,
+      left,
+      right,
+      height: bottom - top,
+      width: right - left
+    };
   }
 
   /**

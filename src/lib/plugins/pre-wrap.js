@@ -7,7 +7,7 @@ function createStyleElement(tag) {
   let sheet = document.createElement('style');
 
   sheet.innerHTML =
-    BLOCKS.map(block => `${tag}.ProseMirror ${block}`).join(',') +
+    BLOCKS.map(block => `${tag} ${block}`).join(',') +
     '{ white-space: pre-wrap; }';
 
   return sheet;

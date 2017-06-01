@@ -4,6 +4,7 @@ export { default as getPlaceholderPlugin } from './placeholder';
 export { default as getEventsPlugin } from './events';
 export { default as getEditablePlugin } from './editable';
 export { history as getHistoryPlugin } from 'prosemirror-history';
+export { default as getPreWrapPlugin } from './pre-wrap';
 import {
   inputRules as makeInputRules,
   allInputRules

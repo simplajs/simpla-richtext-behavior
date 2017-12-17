@@ -188,15 +188,6 @@ export function jsonIsEqual(a, b) {
 }
 
 /**
- * Changes the RegExp to accept both regular spaces and non-breaking spaces.
- * @param  {RegExp} regexp Source regexp to swap spaces out of
- * @return {RegExp}        RegExp which accepts spaces and non-breaking spaces
- */
-export function acceptNbsp(regexp) {
-  return new RegExp(regexp.toString().replace(' ', '( |\u00a0)').slice(1, -1));
-}
-
-/**
  * Functional if...then...else. Condition function should be arity of 2 and take
  *  a node / mark name then take a state. WhenTrue and WhenFalse should both be
  *  arity 3; taking first a node / mark name, then options and finally a state.

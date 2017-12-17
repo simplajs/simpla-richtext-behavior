@@ -77,7 +77,7 @@ export default class {
     this[EDITABLE_KEY] = editablePlugin.key;
 
     plugins = flatten([
-      this.typographer ? getInputRules() : [],
+      this.typographer ? getInputRules(schema) : [],
       editablePlugin,
       getCustomPlugins({
         schema,

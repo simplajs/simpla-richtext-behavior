@@ -1,7 +1,7 @@
 import {
   orderedListRule as getOrderedListRule,
   bulletListRule as getBulletListRule
-} from 'prosemirror-inputrules';
+} from '../input-rules';
 import {
   toggleMark,
   applyMark,
@@ -25,7 +25,6 @@ import {
   getCurrentBlock,
   wrappedIn,
   canToggleWrapping,
-  acceptNbsp,
   canEmbed
 } from '../utils';
 
@@ -80,10 +79,6 @@ export const list = {
   getInputRules({ schema }) {
     let orderedListRule = getOrderedListRule(schema.nodes.orderedList),
         unorderedListRule = getBulletListRule(schema.nodes.unorderedList);
-
-    // Addresses https://github.com/ProseMirror/prosemirror/issues/598
-    orderedListRule.match = acceptNbsp(orderedListRule.match);
-    unorderedListRule.match = acceptNbsp(unorderedListRule.match);
 
     return [orderedListRule, unorderedListRule];
   }

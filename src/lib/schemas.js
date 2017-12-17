@@ -85,7 +85,7 @@ export const list = {
 
 export const inline = {
   nodes: {
-    doc: { content: 'inline<_>*' },
+    doc: { content: 'inline*' },
     text: nodes.text,
     hardBreak: nodes.hard_break
   }

@@ -5,13 +5,4 @@ export { default as getEventsPlugin } from './events';
 export { default as getEditablePlugin } from './editable';
 export { history as getHistoryPlugin } from 'prosemirror-history';
 export { default as getPreWrapPlugin } from './pre-wrap';
-import {
-  inputRules as makeInputRules,
-  allInputRules
-} from 'prosemirror-inputrules';
-
-export function getInputRules(opts = {}) {
-  let { rules = allInputRules } = opts;
-
-  return makeInputRules({ rules });
-}
+export { default as getInputRules } from './input-rules';
